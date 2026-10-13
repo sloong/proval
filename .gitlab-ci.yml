@@ -6,9 +6,12 @@ stages:
     image: oven/bun:1.3.11
     stage: verify
     tags:
-        - container
+        - linux
+        - docker
     rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+        - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+        - if: '$CI_COMMIT_TAG'
     before_script:
         - bun install --frozen-lockfile
 
@@ -37,7 +40,8 @@ docker_build:
     image: docker:24
     stage: verify
     tags:
-        - container
+        - linux
+        - docker
     services:
         - docker:24-dind
     variables:
@@ -45,6 +49,8 @@ docker_build:
         DOCKER_DRIVER: overlay2
     rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+        - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+        - if: '$CI_COMMIT_TAG'
     script:
         - docker build -t proval:ci .
 
@@ -52,7 +58,8 @@ docker_build:
     image: docker:24
     stage: build
     tags:
-        - container
+        - linux
+        - docker
     services:
         - docker:24-dind
     variables:
